@@ -390,8 +390,8 @@ public class WsdlToBallerina {
             .append(WHITESPACE).append(CHECK).append(WHITESPACE).append(SELF).append(DOT).append(CLIENT_ENDPOINT_FIELD)
             .append(ARROW).append(SEND_RECEIVE).append(OPEN_PARENTHESIS).append(CHECK).append(WHITESPACE)
             .append(XMLDATA_TO_XML).append(OPEN_PARENTHESIS).append(ENVELOPE).append(CLOSE_PARENTHESIS)
-            .append(COMMA).append(WHITESPACE).append(QUOTATION_MARK).append(operationAction)
-            .append(QUOTATION_MARK).append(CLOSE_PARENTHESIS).append(SEMICOLON)
+            .append(COMMA).append(WHITESPACE).append(buildActionArg(operationAction))
+            .append(CLOSE_PARENTHESIS).append(SEMICOLON)
             .append(RETURN).append(WHITESPACE).append(XMLDATA_PARSE_AS_TYPE)
             .append(OPEN_PARENTHESIS).append(RESULT).append(CLOSE_PARENTHESIS).append(SEMICOLON)
             .append(CLOSE_BRACES)
@@ -410,10 +410,17 @@ public class WsdlToBallerina {
             .append(CHECK).append(WHITESPACE).append(SELF).append(DOT).append(CLIENT_ENDPOINT_FIELD)
             .append(ARROW).append(SEND_ONLY).append(OPEN_PARENTHESIS).append(CHECK).append(WHITESPACE)
             .append(XMLDATA_TO_XML).append(OPEN_PARENTHESIS).append(ENVELOPE).append(CLOSE_PARENTHESIS)
-            .append(COMMA).append(WHITESPACE).append(QUOTATION_MARK).append(operationAction)
-            .append(QUOTATION_MARK).append(CLOSE_PARENTHESIS).append(SEMICOLON)
+            .append(COMMA).append(WHITESPACE).append(buildActionArg(operationAction))
+            .append(CLOSE_PARENTHESIS).append(SEMICOLON)
             .append(CLOSE_BRACES)
             .toString();
+    }
+
+    private static String buildActionArg(String operationAction) {
+        if (operationAction == null) {
+            return OPEN_PARENTHESIS + CLOSE_PARENTHESIS;
+        }
+        return QUOTATION_MARK + operationAction + QUOTATION_MARK;
     }
 
     private static NodeList<ImportDeclarationNode> createImportNodes(String... importStatements) {
