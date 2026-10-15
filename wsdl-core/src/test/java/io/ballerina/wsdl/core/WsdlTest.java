@@ -180,37 +180,37 @@ public class WsdlTest {
     }
 
     @org.junit.jupiter.api.Test
-    void testOneWayOperation() throws Exception {
+    void testInOnlyOperation() throws Exception {
         WsdlCmd wsdlCmd = new WsdlCmd();
         WsdlToBallerinaResponse response = wsdlCmd.wsdlToBallerina(String.valueOf(RES_DIR.resolve(WSDL_DIR).resolve(
                 "one_way_operation.wsdl")), "", new String[]{"urn:ping"});
         Assert.assertTrue(response.getDiagnostics().isEmpty(),
-                "One-way operation should not produce errors");
+                "In-only operation should not produce errors");
         Assert.assertFalse(response.getClientSources().isEmpty(),
-                "Client source should be generated for one-way operation");
+                "Client source should be generated for in-only operation");
         String clientContent = response.getClientSources().get(0).content();
         Assert.assertTrue(clientContent.contains("sendOnly"),
-                "One-way operation should use sendOnly");
+                "In-only operation should use sendOnly");
         Assert.assertTrue(clientContent.contains("returns error?"),
-                "One-way operation should return error?");
+                "In-only operation should return error?");
         Assert.assertFalse(clientContent.contains("sendReceive"),
-                "One-way operation should not use sendReceive");
+                "In-only operation should not use sendReceive");
         Assert.assertFalse(clientContent.contains("SoapResponse"),
-                "One-way operation should not generate response types");
+                "In-only operation should not generate response types");
     }
 
     @org.junit.jupiter.api.Test
-    void testCombinedOneWayAndTwoWayOperations() throws Exception {
+    void testCombinedInOnlyAndTwoWayOperations() throws Exception {
         WsdlCmd wsdlCmd = new WsdlCmd();
         WsdlToBallerinaResponse response = wsdlCmd.wsdlToBallerina(String.valueOf(RES_DIR.resolve(WSDL_DIR).resolve(
                 "combined_one_way_operation.wsdl")), "", new String[]{"urn:echo", "urn:ping"});
         Assert.assertTrue(response.getDiagnostics().isEmpty(),
-                "Combined one-way and two-way operations should not produce errors");
+                "Combined in-only and two-way operations should not produce errors");
         Assert.assertFalse(response.getClientSources().isEmpty(),
                 "Client source should be generated");
         String clientContent = response.getClientSources().get(0).content();
         Assert.assertTrue(clientContent.contains("sendOnly"),
-                "One-way operation should use sendOnly");
+                "In-only operation should use sendOnly");
         Assert.assertTrue(clientContent.contains("sendReceive"),
                 "Two-way operation should use sendReceive");
     }
@@ -221,14 +221,14 @@ public class WsdlTest {
         WsdlToBallerinaResponse response = wsdlCmd.wsdlToBallerina(String.valueOf(RES_DIR.resolve(WSDL_DIR).resolve(
                 "combined_one_way_operation.wsdl")), "", new String[]{"urn:echo"});
         Assert.assertTrue(response.getDiagnostics().isEmpty(),
-                "Filtering to two-way operation in WSDL with one-way ops should not produce errors");
+                "Filtering to two-way operation in WSDL with in-only ops should not produce errors");
         Assert.assertFalse(response.getClientSources().isEmpty(),
                 "Client source should be generated");
         String clientContent = response.getClientSources().get(0).content();
         Assert.assertTrue(clientContent.contains("sendReceive"),
                 "Filtered two-way operation should use sendReceive");
         Assert.assertFalse(clientContent.contains("sendOnly"),
-                "Filtered result should not contain one-way operation");
+                "Filtered result should not contain in-only operation");
     }
 
     @org.junit.jupiter.api.Test
@@ -266,7 +266,7 @@ public class WsdlTest {
         Assert.assertTrue(clientContent.contains("sendReceive"),
                 "Request-response operation should use sendReceive");
         Assert.assertTrue(clientContent.contains("sendOnly"),
-                "True one-way operation should use sendOnly");
+                "In-only operation should use sendOnly");
         Assert.assertTrue(clientContent.contains("sendRobust"),
                 "Robust in-only operation should use sendRobust");
     }

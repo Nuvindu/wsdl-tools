@@ -97,7 +97,7 @@ public final class Utils {
                                WHITESPACE + responseFieldName + QUESTION_MARK + SEMICOLON, false);
     }
 
-    public static void generateOneWayTypeDefinitions(String namespace, Map<String, ModuleMemberDeclarationNode> nodes,
+    public static void generateInOnlyTypeDefinitions(String namespace, Map<String, ModuleMemberDeclarationNode> nodes,
                                                     String requestType, String requestFieldName,
                                                     OperationContext operation) {
         String requestBody = String.format(XMLDATA_NAMESPACE, SOAP, namespace) + LINE_BREAK +

@@ -36,7 +36,7 @@ public class WsdlOperation {
     private final String operationUri;
     private final String inputHeaderName;
     private final Map<String, HeaderPart> headerElements;
-    private final boolean oneWay;
+    private final boolean inOnly;
     private final boolean robustInOnly;
 
     private WsdlOperation(Builder builder) {
@@ -47,7 +47,7 @@ public class WsdlOperation {
         this.operationName = builder.operationName;
         this.headerElements = builder.headerElements;
         this.inputHeaderName = builder.inputHeaderName;
-        this.oneWay = builder.oneWay;
+        this.inOnly = builder.inOnly;
         this.robustInOnly = builder.robustInOnly;
     }
 
@@ -79,8 +79,8 @@ public class WsdlOperation {
         return inputHeaderName;
     }
 
-    public boolean isOneWay() {
-        return oneWay;
+    public boolean isInOnly() {
+        return inOnly;
     }
 
     public boolean isRobustInOnly() {
@@ -99,7 +99,7 @@ public class WsdlOperation {
         private String operationUri;
         private String inputHeaderName;
         private Map<String, HeaderPart> headerElements = new HashMap<>();
-        private boolean oneWay;
+        private boolean inOnly;
         private boolean robustInOnly;
 
         public Builder(String operationName) {
@@ -114,7 +114,7 @@ public class WsdlOperation {
             this.operationUri = wsdlOperation.operationUri;
             this.headerElements = wsdlOperation.headerElements;
             this.inputHeaderName = wsdlOperation.inputHeaderName;
-            this.oneWay = wsdlOperation.oneWay;
+            this.inOnly = wsdlOperation.inOnly;
             this.robustInOnly = wsdlOperation.robustInOnly;
         }
 
@@ -160,8 +160,8 @@ public class WsdlOperation {
             return this;
         }
 
-        public Builder setOneWay(boolean oneWay) {
-            this.oneWay = oneWay;
+        public Builder setInOnly(boolean inOnly) {
+            this.inOnly = inOnly;
             return this;
         }
 

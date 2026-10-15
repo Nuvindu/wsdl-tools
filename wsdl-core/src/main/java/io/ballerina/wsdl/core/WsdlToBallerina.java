@@ -276,8 +276,8 @@ public class WsdlToBallerina {
                 ? getElementName(operation.getOperationInput(), getWsdlDefinition()) : requestType;
         String suffix = soapPorts.size() > 1 ? convertToPascalCase(port.getName()) : EMPTY_STRING;
         OperationContext operationContext = new OperationContext(operation.getOperationName(), suffix);
-        if (operation.isOneWay()) {
-            Utils.generateOneWayTypeDefinitions(getSoapNamespace(), nodes, requestType, requestFieldName,
+        if (operation.isInOnly()) {
+            Utils.generateInOnlyTypeDefinitions(getSoapNamespace(), nodes, requestType, requestFieldName,
                                                 operationContext);
         } else {
             String responseType = getElementType(operation.getOperationOutput(), getWsdlDefinition(), nodes);
@@ -353,8 +353,8 @@ public class WsdlToBallerina {
             if (operation.isRobustInOnly()) {
                 functionCode = buildRobustInOnlyRemoteFunctionCode(operationContext, operation.getOperationName(),
                         operation.getOperationAction());
-            } else if (operation.isOneWay()) {
-                functionCode = buildOneWayRemoteFunctionCode(operationContext, operation.getOperationName(),
+            } else if (operation.isInOnly()) {
+                functionCode = buildInOnlyRemoteFunctionCode(operationContext, operation.getOperationName(),
                         operation.getOperationAction());
             } else {
                 functionCode = buildRemoteFunctionCode(operationContext, operation.getOperationName(),
@@ -402,7 +402,7 @@ public class WsdlToBallerina {
             .toString();
     }
 
-    private static String buildOneWayRemoteFunctionCode(OperationContext operationContext, String operationName,
+    private static String buildInOnlyRemoteFunctionCode(OperationContext operationContext, String operationName,
                                                         String operationAction) {
         return new StringBuilder()
             .append(REMOTE).append(WHITESPACE).append(ISOLATED).append(WHITESPACE).append(FUNCTION)
@@ -572,22 +572,22 @@ public class WsdlToBallerina {
             WsdlOperation wsdlOperation = getWsdlOperation(bindingOperation);
             Objects.requireNonNull(bindingOperation.getBindingInput(),
                     "Invalid binding operation: Binding input is null.");
-            boolean isOneWay = bindingOperation.getBindingOutput() == null
+            boolean isInOnly = bindingOperation.getBindingOutput() == null
                     && bindingOperation.getOperation().getOutput() == null;
-            boolean isRobustInOnly = isOneWay
+            boolean isRobustInOnly = isInOnly
                     && !bindingOperation.getOperation().getFaults().isEmpty();
-            if (!isOneWay) {
+            if (!isInOnly) {
                 Objects.requireNonNull(bindingOperation.getBindingOutput(),
                         "Invalid binding operation: Binding output is null.");
             }
             String inputPayload = bindingOperation.getBindingInput().getName();
-            String outputPayload = isOneWay ? null : bindingOperation.getBindingOutput().getName();
+            String outputPayload = isInOnly ? null : bindingOperation.getBindingOutput().getName();
             Map<String, HeaderPart> headerParts = new HashMap<>();
             String inputHeaderName = generateSOAPInputHeaderParts(bindingOperation, headerParts, getSoapVersion());
             Objects.requireNonNull(bindingOperation.getOperation().getInput().getMessage(),
                     "Message element is missing in the input of the operation: " +
                     bindingOperation.getOperation().getName());
-            if (!isOneWay) {
+            if (!isInOnly) {
                 Objects.requireNonNull(bindingOperation.getOperation().getOutput().getMessage(),
                         "Message element is missing in the output of the operation: " +
                         bindingOperation.getOperation().getName());
@@ -595,7 +595,7 @@ public class WsdlToBallerina {
             inputPayload = (inputPayload == null)
                     ? bindingOperation.getOperation().getInput().getMessage().getQName().getLocalPart()
                     : inputPayload;
-            if (!isOneWay) {
+            if (!isInOnly) {
                 outputPayload = (outputPayload == null)
                         ? bindingOperation.getOperation().getOutput().getMessage().getQName().getLocalPart()
                         : outputPayload;
@@ -604,7 +604,7 @@ public class WsdlToBallerina {
                     .setOperationName(bindingOperation.getOperation().getName())
                     .setOperationInput(inputPayload)
                     .setOperationOutput(outputPayload)
-                    .setOneWay(isOneWay)
+                    .setInOnly(isInOnly)
                     .setRobustInOnly(isRobustInOnly)
                     .setInputHeaderName(inputHeaderName)
                     .setHeaderElements(headerParts)
