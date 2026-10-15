@@ -37,6 +37,7 @@ public class WsdlOperation {
     private final String inputHeaderName;
     private final Map<String, HeaderPart> headerElements;
     private final boolean oneWay;
+    private final boolean robustInOnly;
 
     private WsdlOperation(Builder builder) {
         this.operationAction = builder.operationAction;
@@ -47,6 +48,7 @@ public class WsdlOperation {
         this.headerElements = builder.headerElements;
         this.inputHeaderName = builder.inputHeaderName;
         this.oneWay = builder.oneWay;
+        this.robustInOnly = builder.robustInOnly;
     }
 
     public String getOperationName() {
@@ -81,6 +83,10 @@ public class WsdlOperation {
         return oneWay;
     }
 
+    public boolean isRobustInOnly() {
+        return robustInOnly;
+    }
+
     public Builder toBuilder() {
         return new Builder(this);
     }
@@ -94,6 +100,7 @@ public class WsdlOperation {
         private String inputHeaderName;
         private Map<String, HeaderPart> headerElements = new HashMap<>();
         private boolean oneWay;
+        private boolean robustInOnly;
 
         public Builder(String operationName) {
             this.operationName = operationName;
@@ -108,6 +115,7 @@ public class WsdlOperation {
             this.headerElements = wsdlOperation.headerElements;
             this.inputHeaderName = wsdlOperation.inputHeaderName;
             this.oneWay = wsdlOperation.oneWay;
+            this.robustInOnly = wsdlOperation.robustInOnly;
         }
 
         public Builder setOperationName(String operationName) {
@@ -154,6 +162,11 @@ public class WsdlOperation {
 
         public Builder setOneWay(boolean oneWay) {
             this.oneWay = oneWay;
+            return this;
+        }
+
+        public Builder setRobustInOnly(boolean robustInOnly) {
+            this.robustInOnly = robustInOnly;
             return this;
         }
 
