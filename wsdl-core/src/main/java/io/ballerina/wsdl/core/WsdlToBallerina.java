@@ -138,6 +138,7 @@ public class WsdlToBallerina {
     public static final String ARROW = "->";
     public static final String SEND_RECEIVE = "sendReceive";
     public static final String SEND_ONLY = "sendOnly";
+    public static final String SEND_ROBUST = "sendRobust";
     public static final String XMLDATA_TO_XML = "xmldata:toXml";
     public static final String QUOTATION_MARK = "\"";
     public static final String XMLDATA_PARSE_AS_TYPE = "xmldata:parseAsType";
@@ -349,7 +350,10 @@ public class WsdlToBallerina {
             OperationContext operationContext = generateEnvelopeTypes(operation, nodes, port,
                     response.getResolvedNameMeta());
             String functionCode;
-            if (operation.isOneWay()) {
+            if (operation.isRobustInOnly()) {
+                functionCode = buildRobustInOnlyRemoteFunctionCode(operationContext, operation.getOperationName(),
+                        operation.getOperationAction());
+            } else if (operation.isOneWay()) {
                 functionCode = buildOneWayRemoteFunctionCode(operationContext, operation.getOperationName(),
                         operation.getOperationAction());
             } else {
@@ -409,6 +413,24 @@ public class WsdlToBallerina {
             .append(OPEN_BRACES)
             .append(CHECK).append(WHITESPACE).append(SELF).append(DOT).append(CLIENT_ENDPOINT_FIELD)
             .append(ARROW).append(SEND_ONLY).append(OPEN_PARENTHESIS).append(CHECK).append(WHITESPACE)
+            .append(XMLDATA_TO_XML).append(OPEN_PARENTHESIS).append(ENVELOPE).append(CLOSE_PARENTHESIS)
+            .append(COMMA).append(WHITESPACE).append(buildActionArg(operationAction))
+            .append(CLOSE_PARENTHESIS).append(SEMICOLON)
+            .append(CLOSE_BRACES)
+            .toString();
+    }
+
+    private static String buildRobustInOnlyRemoteFunctionCode(OperationContext operationContext, String operationName,
+                                                                String operationAction) {
+        return new StringBuilder()
+            .append(REMOTE).append(WHITESPACE).append(ISOLATED).append(WHITESPACE).append(FUNCTION)
+            .append(WHITESPACE).append(convertToCamelCase(operationName))
+            .append(OPEN_PARENTHESIS).append(operationContext.requestName()).append(WHITESPACE).append(ENVELOPE)
+            .append(CLOSE_PARENTHESIS).append(WHITESPACE).append(RETURNS).append(WHITESPACE)
+            .append(ERROR_OR_NIL).append(WHITESPACE)
+            .append(OPEN_BRACES)
+            .append(CHECK).append(WHITESPACE).append(SELF).append(DOT).append(CLIENT_ENDPOINT_FIELD)
+            .append(ARROW).append(SEND_ROBUST).append(OPEN_PARENTHESIS).append(CHECK).append(WHITESPACE)
             .append(XMLDATA_TO_XML).append(OPEN_PARENTHESIS).append(ENVELOPE).append(CLOSE_PARENTHESIS)
             .append(COMMA).append(WHITESPACE).append(buildActionArg(operationAction))
             .append(CLOSE_PARENTHESIS).append(SEMICOLON)
@@ -552,6 +574,8 @@ public class WsdlToBallerina {
                     "Invalid binding operation: Binding input is null.");
             boolean isOneWay = bindingOperation.getBindingOutput() == null
                     && bindingOperation.getOperation().getOutput() == null;
+            boolean isRobustInOnly = isOneWay
+                    && !bindingOperation.getOperation().getFaults().isEmpty();
             if (!isOneWay) {
                 Objects.requireNonNull(bindingOperation.getBindingOutput(),
                         "Invalid binding operation: Binding output is null.");
@@ -581,6 +605,7 @@ public class WsdlToBallerina {
                     .setOperationInput(inputPayload)
                     .setOperationOutput(outputPayload)
                     .setOneWay(isOneWay)
+                    .setRobustInOnly(isRobustInOnly)
                     .setInputHeaderName(inputHeaderName)
                     .setHeaderElements(headerParts)
                     .build();
